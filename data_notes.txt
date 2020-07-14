@@ -1,0 +1,74 @@
+https://www.cdc.gov/nchs/data/slaits/2011NSCHQuestionnaire.pdf
+https://ftp.cdc.gov/pub/Health_Statistics/NCHS/slaits/nsch_2011_2012/04_List_of_variables_and_frequency_counts/create_formatted_frequencies.pdf
+
+
+df1 = nsch_2011_2012_puf
+Size = (95677, 367)
+0	IDNUMR
+1	SAMPLE
+2	STATE
+3	MSA_STAT
+4	TOTKIDS4
+5	AGEYR_CHILD
+6	FLG_18_MNTH
+7	FLG_06_MNTH
+8	AGEPOS4
+9	SEX
+10	RELATION
+11	PLANGUAGE
+12	K2Q01
+...
+363	K12Q67
+364	OTH_LANG
+365	SUMMER
+366	NSCHWT
+
+
+df2 = nsch_2011_2012_vi_puf (vi = Virgin Islands)
+# Warning: column count mismatch (36 + 255 != 341)
+Size = (2342, 341)
+0	IDNUMR
+1	SAMPLE
+2	STATE
+3	TOTKIDS4
+4	AGEYR_CHILD
+5	FLG_18_MNTH
+6	FLG_06_MNTH
+7	AGEPOS4
+8	SEX
+9	RELATION
+10	PLANGUAGE
+11	K2Q01
+...
+339	K12Q67
+340	NSCHWT
+
+
+df3 = nsch1112mimp
+Size = (478385, 4) 
+0	IDNUMR - 5 rows per IDNUMR. Imputation = 1-5
+1	IMPUTATION
+2	POVLEVEL_F
+3	POVLEVEL_I
+
+
+df4 = nsch1112mimp_vi
+Size = (11710, 4) 
+0	IMPUTATION
+1	IDNUMR - 5 rows per IDNUMR. Imputation = 1-5
+2	POVLEVEL_F
+3	POVLEVEL_I
+
+
+(READ IF NECESSARY: Has a doctor or other health care provider ever told you that [S.C.]
+had…)
+K2Q31A Attention Deficit Disorder or Attention-Deficit/Hyperactivity Disorder, that is, ADD or ADHD?
+HELP SCREEN: A child with Attention Deficit Disorder or Attention Deficit Hyperactive
+Disorder has problems paying attention or sitting still. It may cause the child to be easily
+distracted.
+
+K2Q31D Is [S.C.] currently taking medication for ADD or ADHD?
+(1) YES
+(2) NO
+(77) DON'T KNOW
+(99) REFUSED
