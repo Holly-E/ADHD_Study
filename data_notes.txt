@@ -1,0 +1,230 @@
+https://www.cdc.gov/nchs/data/slaits/2011NSCHQuestionnaire.pdf
+https://ftp.cdc.gov/pub/Health_Statistics/NCHS/slaits/nsch_2011_2012/04_List_of_variables_and_frequency_counts/create_formatted_frequencies.pdf
+https://towardsdatascience.com/feature-selection-correlation-and-p-value-da8921bfb3cf
+
+
+df1 = nsch_2011_2012_puf
+Size = (95677, 367)
+0	IDNUMR
+1	SAMPLE
+2	STATE
+3	MSA_STAT
+4	TOTKIDS4
+5	AGEYR_CHILD
+6	FLG_18_MNTH
+7	FLG_06_MNTH
+8	AGEPOS4
+9	SEX
+10	RELATION
+11	PLANGUAGE
+12	K2Q01
+...
+363	K12Q67
+364	OTH_LANG
+365	SUMMER
+366	NSCHWT
+
+
+df2 = nsch_2011_2012_vi_puf (vi = Virgin Islands)
+# Warning: column count mismatch (36 + 255 != 341)
+Size = (2342, 341)
+0	IDNUMR
+1	SAMPLE
+2	STATE
+3	TOTKIDS4
+4	AGEYR_CHILD
+5	FLG_18_MNTH
+6	FLG_06_MNTH
+7	AGEPOS4
+8	SEX
+9	RELATION
+10	PLANGUAGE
+11	K2Q01
+...
+339	K12Q67
+340	NSCHWT
+
+
+df3 = nsch1112mimp
+Size = (478385, 4) 
+0	IDNUMR - 5 rows per IDNUMR. Imputation = 1-5
+1	IMPUTATION
+2	POVLEVEL_F
+3	POVLEVEL_I
+
+
+df4 = nsch1112mimp_vi
+Size = (11710, 4) 
+0	IMPUTATION
+1	IDNUMR - 5 rows per IDNUMR. Imputation = 1-5
+2	POVLEVEL_F
+3	POVLEVEL_I
+
+
+(READ IF NECESSARY: Has a doctor or other health care provider ever told you that [S.C.]
+had…)
+K2Q31A Attention Deficit Disorder or Attention-Deficit/Hyperactivity Disorder, that is, ADD or ADHD?
+HELP SCREEN: A child with Attention Deficit Disorder or Attention Deficit Hyperactive
+Disorder has problems paying attention or sitting still. It may cause the child to be easily
+distracted.
+
+K2QXXA_1 How old was [S.C.] when you were first told by a doctor or other health care provider that [he/she] had [CONDITION]? 
+ RECORD AGE IN YEARS OR MONTHS    (77) DON'T KNOW (99) REFUSED 
+
+K2Q31D Is [S.C.] currently taking medication for ADD or ADHD?
+(1) YES
+(2) NO
+(77) DON'T KNOW
+(99) REFUSED
+
+K2Q35A_1 Autism
+K2Q35D Autism
+K2QXXB Anxiety
+K2QXXC Anxiety
+
+Drop for Training:
+- 0 - Questions to ask if s.c. has ADHD
+- 1 - Medication
+- 1 - Seeing a specialist (looking for undiagnosed people)
+- 1 - Extrinsic factors not related to s.c.'s brain (ex. CHIP, employer)
+
+- 0 - Questions to ask if s.c. has ADHD: 
+K2Q31A_1 How old was [S.C.] when you were first told by a doctor or other health care provider that [he/she] had ADD or ADHD? (Age) 
+K2Q31A_2 How old was [S.C.] when you were first told by a doctor or other health care provider that [he/she] had ADD or ADHD? (Unit of Measure) 
+K2Q31B Does [S.C.] currently have ADD or ADHD? 
+K2Q31C Would you describe [his/her] ADD or ADHD as mild, moderate, or severe? 
+K2Q31D Is [S.C.] currently taking medication for ADD or ADHD
+
+Initial model with 92% accruacy essentially predicting all 'K2Q34A' (conduct problems) as having an ADHD diagnosis.
+
+Highest RF prediction variable for Round 11 - conduct included:
+all except ADHD indicators (301) 
+
+K2Q22 4.5% - Does [S.C.] have any kind of emotional, developmental, or behavioral problem for which [he/she] needs treatment or counseling? 
+K2Q10 3.8% - Does [S.C.] currently need or use medicine prescribed by a doctor, other than vitamins? 
+Child with Special Health Care Need (CSHCN) 3.7% - Derived. 
+K2Q30A 3.6% - Has a doctor, health care provider, teacher, or school official ever told you [S.C.] had a learning disability? 
+K2Q34A 2.8% - Has a doctor or other health care provider ever told you that [S.C.] had behavioral or conduct problems, such as oppositional defiant disorder or conduct disorder? 
+
+I would like to create a model that looks at predicting K2Q34A.
+
+https://www.additudemag.com/symptoms-of-add-hyperarousal-rejection-sensitivity/
+From this perspective, three defining features of ADHD emerge that explain every aspect of the condition:
+1. An interest-based nervous system
+2. Emotional hyperarousal
+3. Rejection sensitivity
+
+1. The ADHD nervous system is interest-based, rather than importance- or priority-based.
+People with ADHD often say they “get in the zone” or “hit a groove.” These are all ways of describing a state of hyperfocus – intense concentration on a particular task, during which the individual feels she can accomplish anything. In fact, she may become so intently focused that the adult with ADD may lose all sense of how much time has passed.
+It is only created by a momentary sense of interest, competition, novelty, or urgency created by a do-or-die deadline.
+
+2. Most people expect ADHD to create visible hyperactivity. This only occurs in 25% of children and 5% of adults. 
+The rest experience an internal feeling of hyperarousal.
+People with ADHD have passionate thoughts and emotions that are more intense than those of the average person. Their highs are higher and their lows are lower. 
+This means you may experience both happiness and criticism more powerfully than your peers and loved ones do.
+Children with ADHD know they are “different,” which is rarely experienced as a good thing. 
+They may develop low self-esteem because they realize they fail to get engaged and finish what they start, and because children make no distinction between what you do and who you are. 
+Shame can become a dominant emotion into adulthood as harsh internal dialogues, or criticism from others, becomes ingrained.
+
+Mood disorders are characterized by moods that have taken on a life of their own, separate from the events of the person’s life, and often last for more than two weeks. 
+Moods created by ADHD are almost always triggered by events and perceptions, and resolve very quickly. 
+They are normal moods in every way except for their intensity.
+
+3. Rejection sensitive dysphoria (RSD) is an intense vulnerability to the perception – not necessarily the reality – of being rejected, teased, or criticized by important people in your life. 
+RSD causes extreme emotional pain that may also be triggered by a sense of failure, or falling short – failing to meet either your own high standards or others’ expectations.
+Often, people experience RSD as physical pain, like they’ve been stabbed or struck right in the center of their chest.
+98-99% of adolescents and adults with ADHD acknowledge experiencing RSD. 
+For 30%, RSD is the most impairing aspect of their ADHD, in part because it does not respond to therapy.
+
+
+- Teeth grinding (Bruxism)
+- Have trouble making friends
+- Sensitive to noise
+- Lateness problem
+- Daydream
+- Poor sense of time
+- Trouble switching tasks
+- Oversharing
+- Social anxiety 
+
+https://www.additudemag.com/hypersensitivity-disorder-with-adhd/#:~:text=It%20is%20an%20attribute%20common,overwhelmed%20by%20too%20much%20information.
+
+“[People with ADHD] often are hypersensitive in one of the sensory domains: sound, touch, or smell,” says Ned Hallowell, M.D., author of Driven to Distraction. 
+ It is an attribute common in people with ADHD. Symptoms of hypersensitivity include being highly sensitive to physical (via sound, sigh, touch, or smell) and or emotional stimuli and the tendency to be easily overwhelmed by too much information.
+
+** https://www.sciencedaily.com/releases/2012/08/120814100158.htm
+Girls with ADHD at risk for self-injury, suicide attempts as young adults
+
+** https://www.additudemag.com/symptoms-of-add-hyperarousal-rejection-sensitivity/
+When the emotional response of RSD is externalized, it can look like a flash of rage. 
+Half of people who are mandated by courts to receive anger-management training had previously unrecognized ADHD.
+Some people avoid rejection by becoming people pleasers. Others just opt out altogether, and choose not to try because making any effort is so anxiety-provoking.
+
+** ADHD in women - underdiagnosis
+https://www.rtor.org/2020/01/15/overdiagnosis-or-underdiagnosis-of-adhd/
+
+* Cerebral palsy comorbidity, tourettes, walking, speech (motor functions) - never mentioned
+- Jerky movements when I drive
+
+
+https://adhdhomestead.net/time-blindness-feels/
+Time blindness
+
+Our culture starts teaching time management to children in preschool. A five-year-old knows how to stop one activity and move on to another. 
+Imagine the pain an adult with ADHD feels when we fail at a basic life skill. It’s easy to forget these skills are learned, not innate. 
+People with ADHD don’t learn them easily. Someone with undiagnosed/untreated ADHD may not be able to learn them at all.
+
+Goal of Survey (CDC's National Survey of Children's Health)
+Assess the physical and emotional health of children aged 0 to 17 years, as well as factors that may relate to  child well-being, including medical homes, family interactions, parental health, school and after-school experiences, and neighborhood characteristics 
+
+SEX DF1
+	Frequency Percent 
+MALE 	 49219 	  51.44 	
+FEMALE	 46349    48.44 
+
+--
+SEX	K2Q31A	MALE
+1.0	0.0	38154
+1.0	1.0	5940
+
+SEX	K2Q31A	FEMALE
+2.0	0.0	38729
+2.0	1.0	2585
+
+12% total males diagnosed with ADHD
+5.5% total females diagnosed with ADHD
+
+Social Anxiety 
+Avoiding tasks that involve interactions with other humans. 
+Feeling like you don't fit in, don't understand the reactions you get.
+I got a realtor license, studied and passed the test. Quit at the point that I had to start working with people.
+
+Task Avoidance
+ADHD people are notorious for this. We move from task to task, pausing to hyperfocus on that new hobby or goal. 
+Then we abandon it and move on to a new one before we complete it. 
+
+What is the point that ADHD people stop and decide on a new direction? 
+If we can determine this, could we find ways to remove that block in the road?
+
+Hypothesis:
+- Social interaction (ex. realtor) 
+	- possibly stems from not understanding the way neurotypical people interact with us
+	- it feels extremely exhausting
+- Boring tasks that have to get done to move to the next part of the idea
+	- unable to kick it on
+- Forget we are working on it (short term memory issues)
+	- We have every intent to get back to it, we get an idea we want to explore, and we forgot we were doing that goal
+	- Feel like I have a lot of ideas
+- Panicking when we are put on the spot and don't know the right answer
+	- Rejection Sensitivity 
+	- Perfectionism
+	- Shame
+
+Goal of Survey:
+https://mchb.hrsa.gov/data/national-surveys/data-user
+The NSCH is the only national and state‐level survey on the health and well‐being of children, their families, and their communities. 
+The data collected are critical for providing states with unique information for the Title V Maternal and Child Health Services Block Grant program, state‐level planning and program development, federal policy and program development, and general scientific research. 
+These data are also used by families, child health advocates, policymakers, and others.
+
+At the risk of sounding cheesy, I am really enjoying the project because it feels like a treasure hunt. 
+When I uncover an important variable, I look it up in the codebook to see what it means. 
