@@ -1,6 +1,9 @@
 https://www.cdc.gov/nchs/data/slaits/2011NSCHQuestionnaire.pdf
 https://ftp.cdc.gov/pub/Health_Statistics/NCHS/slaits/nsch_2011_2012/04_List_of_variables_and_frequency_counts/create_formatted_frequencies.pdf
+<<<<<<< HEAD
 https://towardsdatascience.com/feature-selection-correlation-and-p-value-da8921bfb3cf
+=======
+>>>>>>> ac50a40d383ac985f16e05876451da4e83d818f9
 
 
 df1 = nsch_2011_2012_puf
@@ -68,13 +71,17 @@ HELP SCREEN: A child with Attention Deficit Disorder or Attention Deficit Hypera
 Disorder has problems paying attention or sitting still. It may cause the child to be easily
 distracted.
 
+<<<<<<< HEAD
 K2QXXA_1 How old was [S.C.] when you were first told by a doctor or other health care provider that [he/she] had [CONDITION]? 
  RECORD AGE IN YEARS OR MONTHS    (77) DON'T KNOW (99) REFUSED 
 
+=======
+>>>>>>> ac50a40d383ac985f16e05876451da4e83d818f9
 K2Q31D Is [S.C.] currently taking medication for ADD or ADHD?
 (1) YES
 (2) NO
 (77) DON'T KNOW
+<<<<<<< HEAD
 (99) REFUSED
 
 K2Q35A_1 Autism
@@ -228,3 +235,6 @@ These data are also used by families, child health advocates, policymakers, and 
 
 At the risk of sounding cheesy, I am really enjoying the project because it feels like a treasure hunt. 
 When I uncover an important variable, I look it up in the codebook to see what it means. 
+=======
+(99) REFUSED
+>>>>>>> ac50a40d383ac985f16e05876451da4e83d818f9
