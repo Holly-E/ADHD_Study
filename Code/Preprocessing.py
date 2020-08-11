@@ -5,22 +5,61 @@ ADHD STUDY
 https://ftp.cdc.gov/pub/Health_Statistics/NCHS/slaits/nsch_2011_2012/04_List_of_variables_and_frequency_counts/create_formatted_frequencies.pdf
 """
 
-# Read SAS file using pandas
 import numpy as np
 import pandas as pd
-import seaborn as sn
-import matplotlib.pyplot as plt
-#%%
+#import seaborn as sn
+#import matplotlib.pyplot as plt
+
 np.random.seed(123)
-
-file_path1 = 'C://Master/Semester_6/Github/ADHD_Study/nsch_2011_2012_puf/nsch_2011_2012_puf.sas7bdat'
-df1 = pd.read_sas(file_path1)
-cols1 = df1.columns
-
 
 #%%
 """
-K2Q31A = Has a doctor or other health care provider ever told you that [S.C.] had
+Read File without replacing unkown and refused with -1, -2
+Read SAS file using pandas
+"""
+
+file_path1 = 'C://Master/Semester_6/Github/ADHD_Study/Code/nsch_2011_2012_puf/nsch_2011_2012_puf.sas7bdat'
+df1 = pd.read_sas(file_path1)
+cols1 = df1.columns
+
+"""
+Update responses for unknown and refused according to dict_resp: 
+Unknown answers were coded as “6,” “96,” or “996”  
+Refused responses were coded as “7,” “97,” or “997”  
+"""
+dict_resp = {
+    "unknown": -1,
+    "refused": -2
+    }
+df1_replaced = pd.DataFrame()
+for col in cols1:
+    replace = []
+    vals = df1[col].value_counts()
+    len_answers = len(vals)
+    if len_answers <= 7:
+        replace = [6, 7]
+        df1_replaced[col] = df1[col].replace(replace,[-1,-2])
+    elif len_answers <= 100:  # leave["IDNUMR", "K2Q04R", "NSCHWT"] "
+        replace = [96, 97]
+        df1_replaced[col] = df1[col].replace(replace,[-1,-2])
+    else:
+        df1_replaced[col] = df1[col]
+
+df1_replaced.to_csv('df1_replaced.csv', index = False)
+
+#%%
+
+"""
+Read File without replacing unkown and refused with -1, -2
+Started using df1_replaced at 13th round
+"""
+
+df1 = pd.read_csv('OUTPUT_x_keep_6_no_conduct_code_2RF_Feat_imp.csv')
+cols1 = df1.columns
+
+#%%
+"""
+Target K2Q31A = Has a doctor or other health care provider ever told you that [S.C.] had
 Attention Deficit Disorder or Attention-Deficit/Hyperactivity Disorder, that is, ADD or ADHD?
                         Frequency   Percent     Frequency_VI   Percent_VI
 L - LEGITIMATE SKIP     10040       10.49       174            7.43 
@@ -36,7 +75,14 @@ print(df1['K2Q31A'].value_counts())
 #print(df2['K2Q31A'].value_counts())
 
 """
-OUTPUT
+OUTPUT if using df1_replaced:
+ 0.0    76982
+ 1.0     8528
+-1.0       89
+-2.0       28
+Name: K2Q31A, dtype: int64
+
+OUTPUT:
 0.0    76982
 1.0     8528
 6.0       89
@@ -96,18 +142,26 @@ Autism, Depression Anxiety
 
 """
 """
-df1_corr_target = df1_corr.loc[[target]]
-df1_corr_target.dropna(axis = 1, inplace = True)
+Add correlation column to a df
+"""
+df1_corr_target = pd.DataFrame()
+df1_corr_target['Corr_subset'] = df1_corr['K2Q31A']
+df1_corr_target.drop('K2Q31A', inplace = True)
+df1_corr_target['feature'] = df1_corr_target.index
 
-df1_corr_cols = df1_corr_target.columns
+#%%
+join_df = df1.merge(df1_corr_target, on='feature', how='left')
 
+join_df.to_csv('OUTPUT_x_keep_6_no_conduct_code_2RF_Feat_imp.csv', index = False)
+#%%
+"""
 keep = []
 for col in df1_corr_cols:
     if (df1_corr_target[col][0] >.1) | (df1_corr_target[col][0] < -.1):
         keep.append(col)
 
 df1_corr_strong = df1_corr_target.loc[ : , keep]
-#%%
+
 
 df1_corr_strong_T = df1_corr_strong.T
 df1_corr_strong_T.sort_values(by = target, inplace = True, ascending = False)
@@ -129,8 +183,9 @@ Codes of "Keep in training " that we wish to keep
 
 #codes_keep = codes[codes[codes_column].eq(2)]  #44
 # Keep multiple codes                   
-#codes_keep = codes[codes[codes_column].isin([1,2])] #63
-                  
+codes_keep = codes[codes[codes_column].isin([1,2])] #63
+
+#%%            
 # If were keeping all except ADHD derived 362
 all_cols = list(df1)
 adhd_cols = ['K2Q31A_1', 'K2Q31A_2', 'K2Q31B', 'K2Q31C', 'K2Q31D']
@@ -157,6 +212,11 @@ cols = list(clean)
 # move the column to head of list using index, pop and insert
 cols.insert(0, cols.pop(cols.index(target)))
 clean = clean.loc[:, cols]
+
+#%%
+high_corr = [col for col in cols1 if col not in cols] 
+high_corr_df = pd.DataFrame(data = high_corr, columns = ["Removed"])
+high_corr_df.to_csv('high_corr.csv', index = False)
 
 #%% 
 """
@@ -188,9 +248,6 @@ to see if we can make a model for those that do not have conduct problems
 clean_targeted_no_conduct = clean_targeted.loc[clean_targeted[ 'K2Q34A'].isin([0,6])]
 clean_targeted_no_conduct.info()
 
-"""
-Without conduct
-"""
 # Split into x and Y dfs
 x = clean_targeted_no_conduct.iloc[:,1:]
 Y = pd.DataFrame()
@@ -243,16 +300,17 @@ xtrans.drop('IDNUMR', axis = 1, inplace = True)
 
 dropped = []
 for col in xtrans.columns:
-    #if col not in codes_keep.Variable.values:
+    if col not in codes_keep.Variable.values:
+    
     # ADHD vars only variation
-    if col not in codes_keep:
+    #if col not in codes_keep:
         dropped.append(col)
         xtrans.drop(col, axis = 1, inplace = True)
 
 
 #%%
-xtrans.to_csv('x_keep_7_w_conduct_no_adhd.csv', index = False)
-Y.to_csv('Y7.csv', index = False)
+xtrans.to_csv('x_keep_9_no_conduct_codes_12.csv', index = False)
+Y.to_csv('Y9.csv', index = False)
 
 #%%
 """
@@ -274,11 +332,29 @@ SEX	K2Q31A	FEMALE
 5.5% total females diagnosed with ADHD
 """
 
+    
+#%%
+"""
+Research 
+- Male - Female ration in / not in behavior concerns (with ADHD)
+- Answers to medication questions of those with and without behavior concerns
+"""
+
+
+
 #%%
 """
 Join final features list with codes_keep to get the descriptions
+"""
+joiner = "x_keep_6_no_conduct_code_2RF_Feat_imp.csv"
+df_join = pd.read_csv(joiner)
+df_join_desc = df_join.join(codes.set_index(['Variable']), on = ['feature'], how = 'left' )
 
+#%%
+df_join_desc.to_csv('OUTPUT_' + joiner, index = False)
 
+#%%
+"""
 Calculations to DO:
 P Value between two columns:
 df1_clean = df1.dropna()

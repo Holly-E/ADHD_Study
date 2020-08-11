@@ -15,9 +15,9 @@ from sklearn.metrics import confusion_matrix
 
 #%%
 # Read the data
-filename = 'x_keep_7_w_conduct_no_adhd'
+filename = 'x_keep_9_no_conduct_codes_12'
 x = pd.read_csv(filename + ".csv")
-Y = pd.read_csv('Y7.csv')
+Y = pd.read_csv('Y9.csv')
 
 #x_rem_conduct = x.drop('K2Q34A', axis = 1)
 
@@ -70,38 +70,47 @@ accuracy = sum/x_test.shape[0]
 print(accuracy)
 
 """
-First round - conduct included - 44 vars - keep code 2 - SVM - Keep 2
+First round - 44 - conduct included - 44 vars - keep code 2 - SVM - Keep 2
 0.915 accuracy :)
     
-Second round - no conduct - 63 vars - keep code 1,2 - SVM - Keep 3
+6th round - 44 - First round repeated using Random Forest - Keep 2
+0.915
+
+7th round - 44 - First round repeated normalizing feats - SVM - Keep 2
+0.915
+
+10th round - 44 - no conduct - keep code 2 - RF - Keep 6
+.925
+    
+Second round - 63 - no conduct - 63 vars - keep code 1,2 - SVM - Keep 3
 0.938
 
-Third round - conduct included - 63 vars - keep code 1,2 - SVM - Keep 4
+Third round - 63 - conduct included - keep code 1,2 - SVM - Keep 4
 0.931
 
-Fourth round - Second round repeated using Random Forest - Keep 3
+Fourth round - 63 - Second round repeated using Random Forest - Keep 3
 0.946
 
-Fifth round - Third round repeated using Random Forest - Keep 4
+Fifth round - 63 - Third round repeated using Random Forest - Keep 4
 .939
 
-6th round - First round repeated using Random Forest - Keep 2
-0.915
-
-7th round - First round repeated normalizing feats - SVM - Keep 2
-0.915
-
-8th round - Conduct only - normalizing feats - keep code 1,2 - RF - Keep 5
+8th round - 63 - Conduct only - normalizing feats - keep code 1,2 - RF - Keep 5
 .766
 
-9th round - Conduct only - normalizing feats - keep code 1,2 - SVM - Keep 5
+9th round - 63 - Conduct only - normalizing feats - keep code 1,2 - SVM - Keep 5
 .728
 
-10th round - no conduct - 44 vars - keep code 2 - RF - Keep 6
-.925
-
-11 Round - conduct included - keep all except ADHD indicators (301) - RF (increased estimators) - Keep 7
+11 Round - 301 - conduct included - keep all except ADHD indicators - RF (increased estimators) - Keep 7
 0.935
+
+12 Round - 297 - no conduct - keep all except ADHD indicators - RF (200 estimators) - Keep 8
+0.944 
+
+13 Round - 63 - no conduct - keep code 1,2 - RF - Keep 9
+0.946
+
+14 Round - 63 - no conduct - keep code 1,2 - SVM - Keep 9
+0.940
 """
 
 #%%
@@ -135,6 +144,9 @@ Sixth round
 
 11th round
 0.938
+
+12th round
+0.922
 """
 #%%
 # Extract feature importances
@@ -187,18 +199,27 @@ Sixth Round
 39        K8Q32    0.055981
 38        K8Q31    0.053462
 
+11th Round
   feature  importance
 29   K2Q22    0.045498
 17   K2Q10    0.037985
 31   CSHCN    0.037476
 32  K2Q30A    0.036477
 37  K2Q34A    0.028107
+
+12th Round
+    feature  importance
+32   K2Q30A    0.042085
+31    CSHCN    0.041344
+17    K2Q10    0.035132
+29    K2Q22    0.032271
+118   K4Q22    0.021153
 """
 
 #%%
 
 """
-Get precision - recall score - SVC
+Get precision - recall score - SVM
 """
 from sklearn.metrics import average_precision_score
 y_score = model.decision_function(x_test)
@@ -260,8 +281,7 @@ Predicted ADHD and s.c. is indeed diagnosed AHDH:
     484 out of 682 total predicted 1 = .71 (71% of time - correct that prior diagnosis)
     484 out of 17,102 total rows = .028 (2.8% - correctly identified prior diagnosis out of total pop
     484 out of 1,733 total ADHD diagnosis = .279 (28% - correctly identified prior diagnosis out of ADHD subset)
-"""
-"""
+
 Round 2 - Keep 3
 0.5787024396125225
 [[15125    86]
@@ -276,6 +296,7 @@ Round 9 - Keep 5
 0.8810918031922734
 [[ 35 169]
  [  6 434]]
+
 """
 #%%
 """
