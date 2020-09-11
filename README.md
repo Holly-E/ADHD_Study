@@ -1,10 +1,15 @@
 # ADHD_Study
+Executive Summary  
+Attention deficit hyperactivity disorder (ADHD / ADD) is a life-long neurodevelopmental disorder. ADHD may lead to serious consequences including school dropout, depression, problems with relationships, substance abuse, delinquency, and job failure. The CDC reports that the estimated number of children in the United States diagnosed with ADHD is 6.1 million (9.4%). Boys are more likely to be diagnosed with ADHD than girls (12.9% compared to 5.6%). 
 
-ADHD is a neurodevelopmental disorder affecting adults as well as an estimated 11% of school-age children. ADHD may lead to serious consequences including school dropout, depression, problems with relationships, substance abuse, delinquency, and job failure. The CDC National Children’s Health Survey (NCHS) 2011-2012 dataset contains the responses regarding over 45,000 females and over 45,000 males (under the age of 18). Males were diagnosed with ADD or ADHD at over twice the rate of females (12% of males vs 5.5% of females had been diagnosed).
+Underdiagnosis in female children is a serious problem for those who suffer silently, perhaps lucky enough to find out in adulthood they have a condition that has been holding them back. I was one of those who was undiagnosed in plain sight as a child and impacted as an adult; dropping out of college twice, struggling at work, and failing wildly at relationships. I received a totally different outlook on who I was after receiving a diagnosis in adulthood. According to the research done by Dr. Quinn and Sharon Wigal, Ph.D., associate clinical professor of pediatrics at the University of California at Irvine, four out of 10 teachers report more difficulty in recognizing ADHD symptoms in girls than in boys. (Connolly, 2019) We need to learn how to separate out physical hyperactivity (prevalent in boys) to identify cognitive hyperactivity (prevalent in girls). 
 
-Research suggests this may be due to masking, where the child develops techniques to compensate. (Bowman, 2020) An example of this may be a child who doodles or fidgets in their chair, instead of exhibiting “hyperactive” behavior that interrupts their class. A child with undiagnosed ADHD may have coping techniques that are sufficient for grade school, however they are at risk to be unable to cope with greater challenges of adulthood when they have more autonomy. Early diagnosis and treatment are important. Are these people hiding in plain sight, undetected while exhibiting symptoms that they have ADHD?
- 
-In the dataset, it is possible to create a model with 92% accuracy by predicting that all rows with a 1 for variable 'K2Q34A' (conduct problems) have an ADHD diagnosis. Children who are masking are more likely to have a 0 for this variable, so the focus of this project is on identifying a model that predicts an ADHD diagnosis for their subset of the data. The goal is to identify children who are more likely to be underdiagnosed.
+I created a model that could potentially help identify these undiagnosed children using the CDC National Children’s Health Survey (NCHS) 2011 - 2012 dataset, which included 366 variables. I explored several approaches for determining which data to train the models on to identify females who would be more likely to remain undiagnosed if they are suffering from the disorder. 
+Full set
+SEX = Female only
+K2Q34A = 0
+
+I believe approach #3 is best and will explain the benefits of using this subset in more detail.
 
 Full Report: 
 

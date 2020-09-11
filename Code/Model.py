@@ -15,9 +15,9 @@ from sklearn.metrics import confusion_matrix
 
 #%%
 # Read the data
-filename = 'x_keep_9_no_conduct_codes_12'
+filename = "x_keep_6_no_conduct_code_2"
 x = pd.read_csv(filename + ".csv")
-Y = pd.read_csv('Y9.csv')
+Y = pd.read_csv('Y6.csv')
 
 #x_rem_conduct = x.drop('K2Q34A', axis = 1)
 
@@ -36,6 +36,7 @@ x_train, x_test, y_train, y_test = train_test_split(x, Y, test_size = 0.2)
 Random Forest
 """
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import cross_val_predict
 
 # Create the model with 100 trees
 model = RandomForestClassifier(n_estimators=200, 
@@ -43,6 +44,20 @@ model = RandomForestClassifier(n_estimators=200,
                                max_features = 'sqrt',
                                n_jobs = -1)
 
+#%%
+# get predictions for each row using cross validation 
+y_pred = cross_val_predict(model, x, Y.values.ravel(), cv=3)
+x['predictions'] = y_pred
+x['target'] = Y['K2Q31A']
+
+#%%
+# Male / female ratio and count in target
+# Male / female ratio and count in predictions
+# Get ID column from full df with matching # rows
+
+# Seperate out false positives 
+# Male / female ratio and count in false positive
+# Get list of ID's for false positive females and list for males - save
 
 #%%
 """
@@ -111,6 +126,31 @@ Fifth round - 63 - Third round repeated using Random Forest - Keep 4
 
 14 Round - 63 - no conduct - keep code 1,2 - SVM - Keep 9
 0.940
+
+15 Round - 63 - with conduct - only K2Q31A - K-means - Keep 10
+
+16 Round - 74 - no conduct - Kept corr > .9, replace 6, 7 with Nan & impute vals - keep 16 
+0.946
+
+17 Round - 1 - with conduct - only K2Q34A, leave 6,7 in feat - SVM - keep 17
+0.915
+        
+18 - 121 - conduct included - keep code 3, 4, 5, only rows where SEX - Male - RF - keep 18
+0.926 - RF
+0.915 - SVM
+
+19 - 121 - conduct included - keep code 3, 4, 5, only rows where SEX - Female - RF - keep 19
+0.958 - RF
+0.951 - SVM
+ 
+20 - 70 -  no conduct - keep code 3, 4 - keep 20
+0.944 - RF
+0.938 - SVM
+ 
+21 - 5 - unsupervised 3 and 2 clusters - keep 21  
+
+Final model - Intrinsic vals in keep codes 3, 4 - One vs Rest instead of train/test 0.2 split
+OR use 10th round 
 """
 
 #%%
@@ -147,6 +187,18 @@ Sixth round
 
 12th round
 0.922
+
+16th Round
+0.914
+
+18th Round
+0.930
+
+19th Round
+0.935
+
+20th Round
+0.905
 """
 #%%
 # Extract feature importances
@@ -157,7 +209,7 @@ fi = pd.DataFrame({'feature': list(x.columns),
 # Display
 print(fi.head())
 
-fi.to_csv(filename + "RF_Feat_imp.csv", index = False)
+fi.to_csv("keep_20_RF_Feat_imp.csv", index = False)
 """
 Fourth Round
         feature  importance
@@ -214,6 +266,30 @@ Sixth Round
 17    K2Q10    0.035132
 29    K2Q22    0.032271
 118   K4Q22    0.021153
+
+18th Round (Males)
+   feature  importance
+15   K2Q22    0.057678
+4    K2Q10    0.053141
+17   CSHCN    0.045735
+61   K4Q22    0.045082
+18  K2Q30A    0.038948
+
+19th Round (Females)
+        feature  importance
+18       K2Q30A    0.059301
+15        K2Q22    0.039905
+17        CSHCN    0.038626
+4         K2Q10    0.035097
+0   AGEYR_CHILD    0.034318
+
+20th Round - 70 (3, 4)
+        feature  importance
+0   AGEYR_CHILD    0.085158
+16       K2Q30A    0.056327
+15        CSHCN    0.054334
+57        K7Q84    0.049636
+2         K2Q10    0.048442
 """
 
 #%%
@@ -239,9 +315,10 @@ DF with x_text, y_test, y_score
                              
 #concat_list = ['y_test', 'prediction_df', 'y_score_df']
 
-x_test['y_test'] = y_test
-x_test['prediction'] = prediction
-x_test['y_score'] = y_score
+#x_test['y_test'] = y_test
+#x_test['prediction'] = prediction
+#x_test['y_score'] = y_score
+x_test.to_csv('RF_x_keep_16_no_conduct_code_12.csv', index = False)
 
 #%%
 
@@ -297,6 +374,25 @@ Round 9 - Keep 5
 [[ 35 169]
  [  6 434]]
 
+Round 17 - keep 17
+0.26987098799124754
+[[15171   198]
+ [ 1251   482]]
+
+Round 18 - males 121
+0.741
+[[7486  135]
+ [ 618  580]]
+
+Round 18 - females 121
+0.633
+[[7722   29]
+ [ 372  140]]
+
+Round 20 - 70 feats
+0.550
+[[15170    67]
+ [  949   262]]
 """
 #%%
 """
@@ -342,3 +438,52 @@ print('Area Under ROC: ' + str(trainingSummary.areaUnderROC))
 Output
 Area Under ROC: 0.5
 """
+#%%
+not_norm = pd.read_csv('keep_15_no_conduct_only_ADHD_code_2.csv')
+x = pd.read_csv('keep_15_NORM_no_conduct_only_ADHD_code_2.csv')
+
+from sklearn.cluster import KMeans
+import matplotlib.pyplot as plt
+Sum_of_squared_distances = []
+K = range(1,15)
+for k in K:
+    km = KMeans(n_clusters=k, n_jobs = -1)
+    km = km.fit(x)
+    Sum_of_squared_distances.append(km.inertia_)
+
+plt.plot(K, Sum_of_squared_distances, 'bx-')
+plt.xlabel('k')
+plt.ylabel('Sum_of_squared_distances')
+plt.title('Elbow Method For Optimal k')
+plt.show()
+
+#%%
+kmeans = KMeans(n_clusters=3, random_state=0, n_jobs=-1).fit(x)
+labels = kmeans.labels_
+#label_df = pd.DataFrame(labels, columns = ['labels'])
+
+x_cols = list(x)
+not_norm['label'] = labels
+print(not_norm['label'].value_counts())
+
+centroids = kmeans.cluster_centers_
+centroid_df = pd.DataFrame(data = centroids, columns = x_cols)
+
+centroid_df.to_csv('centroids_3_keep_15.csv', index = False)
+
+#%%
+"""
+Plot K2Q34A and K6Q06 colored by label
+"""
+import seaborn
+import matplotlib.pyplot as plt
+seaborn.set(style='ticks')
+
+fg = seaborn.FacetGrid(data=not_norm, hue='label', col = 'SEX', row= 'K2Q34A', aspect=1.61)
+fg.map(plt.plot, 'K6Q06', 'K2Q34A').add_legend()
+
+#g = sns.FacetGrid(tips, col="time",  row="smoker")
+#g = g.map(plt.scatter, "total_bill", "tip", edgecolor="w")
+
+#%%
+not_norm.to_csv('keep_11_2_clus_w_conduct_only_ADHD_codes_12.csv', index = False)
