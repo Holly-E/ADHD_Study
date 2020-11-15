@@ -14,6 +14,3 @@ I created a model that could potentially help identify these undiagnosed childre
 
 I believe approach #3 is best and will explain the benefits of using this subset in more detail.
 
-Full Report: 
-
-

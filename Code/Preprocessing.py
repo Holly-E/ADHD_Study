@@ -20,6 +20,12 @@ file_path = 'C://Master/Semester_6/Github/ADHD_Study/Code/nsch_2011_2012_puf/nsc
 df = pd.read_sas(file_path)
 
 #%%
+cols = df.columns
+cols1 = [x[0:3] for x in cols]
+df1 = pd.DataFrame()
+df1['cols'] = cols1
+print(df1.cols.value_counts())
+#%%
 """
 9 functions
 """
@@ -78,7 +84,8 @@ def cols_from_df(df_codes, codes, df):
     dropped = []
     for col in df.columns:
         if col not in codes_keep.Variable.values:
-            dropped.append(col)
+            if col != 'SEX':
+                dropped.append(col)
     new_df = df.drop(dropped, axis = 1, inplace = False)
     return new_df
 
@@ -163,15 +170,12 @@ def y_split(KEEP, df):
 
 #%%
 """
-All feats, only male rows 
+all rows 
 """
 df = pd.read_sas(file_path)
-KEEP = 18
-name = "x_keep_{}_w_conduct_male".format(KEEP)
+KEEP = 23
+name = "x_keep_{}".format(KEEP)
 
-search_col = 'SEX'
-good_vals = [1]
-df = keep_rows(search_col, good_vals, df)
 
 df = target_01(df)
 df = hide_67(df)
@@ -181,7 +185,7 @@ x = y_split(KEEP, df)
 
 # Remove columns and adjust vals
 df_codes = pd.read_csv("Corr features codes.csv")
-codes = [3,4,5]
+codes = [3]
 x = cols_from_df(df_codes, codes, x)
 
 save_df(name, x)
@@ -190,10 +194,10 @@ print(len(list(x)))
 #%%
 
 """
-All feats, only female rows 
+only female rows 
 """
 df = pd.read_sas(file_path)
-KEEP = 19
+KEEP = 20
 name =  "x_keep_{}_w_conduct_female".format(KEEP)
 
 search_col = 'SEX'
@@ -208,7 +212,7 @@ x = y_split(KEEP, df)
 
 # Remove columns and adjust vals
 df_codes = pd.read_csv("Corr features codes.csv")
-codes = [3,4,5]
+codes = [3]
 x = cols_from_df(df_codes, codes, x)
 
 save_df(name, x)
@@ -216,15 +220,15 @@ print("Final DF:")
 print(len(list(x)))
 #%%
 """
-only feats from Corr Features Codes 3 & 4, only K2Q34A = 0 rows
+only feats from Corr Features Codes 3, only K2Q34A = 0 rows
 """
 df = pd.read_sas(file_path)
-KEEP = 20
-name = "x_keep_{}_no_conduct_corr_feats_34".format(KEEP)
+KEEP = 22
+name = "x_keep_{}_only_conduct_corr_feats_3".format(KEEP)
 
 # Remove rows and split y
 search_col = 'K2Q34A'
-good_vals = [0]
+good_vals = [1]
 df = keep_rows(search_col, good_vals, df)
 
 df = target_01(df)
@@ -232,7 +236,7 @@ x = y_split(KEEP, df)
 
 # Remove columns and adjust vals
 df_codes = pd.read_csv("Corr features codes.csv")
-codes = [3,4]
+codes = [3]
 x = cols_from_df(df_codes, codes, x)
 
 x = hide_67(x)

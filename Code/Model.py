@@ -15,9 +15,9 @@ from sklearn.metrics import confusion_matrix
 
 #%%
 # Read the data
-filename = "x_keep_6_no_conduct_code_2"
+filename = "x_keep_22_only_conduct_corr_feats_3"
 x = pd.read_csv(filename + ".csv")
-Y = pd.read_csv('Y6.csv')
+Y = pd.read_csv('Y22.csv')
 
 #x_rem_conduct = x.drop('K2Q34A', axis = 1)
 
@@ -44,7 +44,7 @@ model = RandomForestClassifier(n_estimators=200,
                                max_features = 'sqrt',
                                n_jobs = -1)
 
-#%%
+
 # get predictions for each row using cross validation 
 y_pred = cross_val_predict(model, x, Y.values.ravel(), cv=3)
 x['predictions'] = y_pred
@@ -84,6 +84,40 @@ for i in range(cm.shape[0]):
 accuracy = sum/x_test.shape[0]
 print(accuracy)
 
+#%%
+#Ratio of boys to girls. Count of girls. (Predicted = 1, actual = 0)
+#Ratio of boys to girls. Count of girls. (Predicted = 1, actual = 1)
+ 
+df = pd.DataFrame()
+df['target'] = y_test.K2Q31A.values
+df['pred'] = prediction
+desc = []
+for row in range(len(df)):
+    if df['target'][row] == 0:
+        if df['pred'][row] == 0:
+            # True negative
+            desc.append(0)
+        else:
+            # False negative
+            # df['pred'] == 1:
+            desc.append(1)
+    else:
+        # df['target'] == 1:
+        if df['pred'][row] == 0:
+            # False positive
+            desc.append(2)
+        else:
+            # True positive
+            # df['pred'] == 1:
+            desc.append(3)
+
+df['desc'] = desc
+df['sex'] = x_test.SEX.values
+            
+
+counts = df.groupby(by = ['desc', 'sex']).count()
+counts.to_csv('keep_22_counts.csv', index = True)
+#%%
 """
 First round - 44 - conduct included - 44 vars - keep code 2 - SVM - Keep 2
 0.915 accuracy :)
@@ -199,6 +233,45 @@ Sixth round
 
 20th Round
 0.905
+"""
+"""
+
+# precision-recall curve and f1
+from sklearn.datasets import make_classification
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import precision_recall_curve
+from sklearn.metrics import f1_score
+from sklearn.metrics import auc
+from matplotlib import pyplot
+# generate 2 class dataset
+X, y = make_classification(n_samples=1000, n_classes=2, random_state=1)
+# split into train/test sets
+trainX, testX, trainy, testy = train_test_split(X, y, test_size=0.5, random_state=2)
+# fit a model
+model = LogisticRegression(solver='lbfgs')
+model.fit(trainX, trainy)
+# predict probabilities
+lr_probs = model.predict_proba(testX)
+# keep probabilities for the positive outcome only
+lr_probs = lr_probs[:, 1]
+# predict class values
+yhat = model.predict(testX)
+lr_precision, lr_recall, _ = precision_recall_curve(testy, lr_probs)
+lr_f1, lr_auc = f1_score(testy, yhat), auc(lr_recall, lr_precision)
+# summarize scores
+print('Logistic: f1=%.3f auc=%.3f' % (lr_f1, lr_auc))
+# plot the precision-recall curves
+no_skill = len(testy[testy==1]) / len(testy)
+pyplot.plot([0, 1], [no_skill, no_skill], linestyle='--', label='No Skill')
+pyplot.plot(lr_recall, lr_precision, marker='.', label='Logistic')
+# axis labels
+pyplot.xlabel('Recall')
+pyplot.ylabel('Precision')
+# show the legend
+pyplot.legend()
+# show the plot
+pyplot.show()
 """
 #%%
 # Extract feature importances
